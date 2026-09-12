@@ -1,5 +1,7 @@
 package com.abhishek.jobtracker.controller;
 
+import com.abhishek.jobtracker.dto.LoginRequest;
+import com.abhishek.jobtracker.dto.LoginResponse;
 import com.abhishek.jobtracker.dto.RegisterRequest;
 import com.abhishek.jobtracker.dto.UserResponse;
 import com.abhishek.jobtracker.service.UserService;
@@ -29,5 +31,13 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginRequest request) {
+
+        LoginResponse response = userService.loginUser(request);
+
+        return ResponseEntity.ok(response);
     }
 }

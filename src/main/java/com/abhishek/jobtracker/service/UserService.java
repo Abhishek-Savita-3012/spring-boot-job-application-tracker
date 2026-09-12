@@ -1,8 +1,11 @@
 package com.abhishek.jobtracker.service;
 
+import com.abhishek.jobtracker.dto.LoginRequest;
+import com.abhishek.jobtracker.dto.LoginResponse;
 import com.abhishek.jobtracker.dto.RegisterRequest;
 import com.abhishek.jobtracker.dto.UserResponse;
 import com.abhishek.jobtracker.entity.User;
+import com.abhishek.jobtracker.exception.InvalidCredentialsException;
 import com.abhishek.jobtracker.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,34 @@ public class UserService {
                 savedUser.getName(),
                 savedUser.getEmail(),
                 savedUser.getCreatedAt()
+        );
+    }
+
+    public LoginResponse loginUser(LoginRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new InvalidCredentialsException(
+                                "Invalid email or password"
+                        )
+                );
+
+        boolean passwordMatches = passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        );
+
+        if (!passwordMatches) {
+            throw new InvalidCredentialsException(
+                    "Invalid email or password"
+            );
+        }
+
+        return new LoginResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                "Login successful"
         );
     }
 }
