@@ -7,6 +7,7 @@ import com.abhishek.jobtracker.dto.UserResponse;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.exception.InvalidCredentialsException;
 import com.abhishek.jobtracker.repository.UserRepository;
+import com.abhishek.jobtracker.security.JwtService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UserResponse registerUser(RegisterRequest request) {
@@ -63,10 +66,13 @@ public class UserService {
             );
         }
 
+        String token = jwtService.generateToken(user);
+
         return new LoginResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
+                token,
                 "Login successful"
         );
     }
