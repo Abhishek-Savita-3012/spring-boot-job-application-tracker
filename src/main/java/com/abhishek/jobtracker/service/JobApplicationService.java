@@ -1,0 +1,72 @@
+package com.abhishek.jobtracker.service;
+
+import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
+import com.abhishek.jobtracker.dto.JobApplicationResponse;
+import com.abhishek.jobtracker.entity.JobApplication;
+import com.abhishek.jobtracker.entity.User;
+import com.abhishek.jobtracker.repository.JobApplicationRepository;
+import com.abhishek.jobtracker.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+@Service
+public class JobApplicationService {
+
+    private final JobApplicationRepository jobApplicationRepository;
+    private final UserRepository userRepository;
+
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, UserRepository userRepository) {
+        this.jobApplicationRepository = jobApplicationRepository;
+        this.userRepository = userRepository;
+    }
+
+    public JobApplicationResponse createApplication(CreateJobApplicationRequest request, String userEmail) {
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found")
+                );
+
+        JobApplication application = JobApplication.builder()
+                .company(request.getCompany())
+                .role(request.getRole())
+                .location(request.getLocation())
+                .employmentType(request.getEmploymentType())
+                .workMode(request.getWorkMode())
+                .salary(request.getSalary())
+                .salaryCurrency(request.getSalaryCurrency())
+                .jobUrl(request.getJobUrl())
+                .source(request.getSource())
+                .status(request.getStatus())
+                .appliedDate(request.getAppliedDate())
+                .deadline(request.getDeadline())
+                .description(request.getDescription())
+                .user(user)
+                .build();
+
+        JobApplication savedApplication = jobApplicationRepository.save(application);
+
+        return mapToResponse(savedApplication);
+    }
+
+    private JobApplicationResponse mapToResponse(JobApplication application) {
+
+        return new JobApplicationResponse(
+                application.getId(),
+                application.getCompany(),
+                application.getRole(),
+                application.getLocation(),
+                application.getEmploymentType(),
+                application.getWorkMode(),
+                application.getSalary(),
+                application.getSalaryCurrency(),
+                application.getJobUrl(),
+                application.getSource(),
+                application.getStatus(),
+                application.getAppliedDate(),
+                application.getDeadline(),
+                application.getDescription(),
+                application.getCreatedAt(),
+                application.getUpdatedAt()
+        );
+    }
+}
