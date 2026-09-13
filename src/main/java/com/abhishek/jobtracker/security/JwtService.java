@@ -1,6 +1,8 @@
 package com.abhishek.jobtracker.security;
 
 import com.abhishek.jobtracker.entity.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -30,7 +32,8 @@ public class JwtService {
 
         Date now = new Date();
 
-        Date expirationDate = new Date(now.getTime() + expiration);
+        Date expirationDate =
+                new Date(now.getTime() + expiration);
 
         return Jwts.builder()
                 .subject(user.getEmail())
@@ -39,5 +42,33 @@ public class JwtService {
                 .expiration(expirationDate)
                 .signWith(getSigningKey())
                 .compact();
+    }
+
+    private Claims extractAllClaims(String token) {
+
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public String extractEmail(String token) {
+
+        return extractAllClaims(token).getSubject();
+    }
+
+    public boolean isTokenValid(String token, User user) {
+
+        try {
+
+            Claims claims = extractAllClaims(token);
+            String email = claims.getSubject();
+            return email.equals(user.getEmail());
+
+        } catch (JwtException | IllegalArgumentException exception) {
+
+            return false;
+        }
     }
 }
