@@ -7,6 +7,8 @@ import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
 import com.abhishek.jobtracker.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
+import java.util.List;
 
 @Service
 public class JobApplicationService {
@@ -46,6 +48,29 @@ public class JobApplicationService {
         JobApplication savedApplication = jobApplicationRepository.save(application);
 
         return mapToResponse(savedApplication);
+    }
+
+    public List<JobApplicationResponse> getAllApplications(String userEmail) {
+
+        return jobApplicationRepository
+                .findAllByUser_Email(userEmail)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    public JobApplicationResponse getApplicationById(Long id, String userEmail) {
+
+        JobApplication application =
+                jobApplicationRepository
+                        .findByIdAndUser_Email(id, userEmail)
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        return mapToResponse(application);
     }
 
     private JobApplicationResponse mapToResponse(JobApplication application) {
