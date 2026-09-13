@@ -2,6 +2,7 @@ package com.abhishek.jobtracker.service;
 
 import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
 import com.abhishek.jobtracker.dto.JobApplicationResponse;
+import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
@@ -71,6 +72,54 @@ public class JobApplicationService {
                         );
 
         return mapToResponse(application);
+    }
+
+    public JobApplicationResponse updateApplication(Long id, UpdateJobApplicationRequest request, String userEmail) {
+
+        JobApplication application =
+                jobApplicationRepository
+                        .findByIdAndUser_Email(id, userEmail)
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        application.setCompany(request.getCompany());
+        application.setRole(request.getRole());
+        application.setLocation(request.getLocation());
+        application.setEmploymentType(request.getEmploymentType());
+        application.setWorkMode(request.getWorkMode());
+        application.setSalary(request.getSalary());
+        application.setSalaryCurrency(request.getSalaryCurrency());
+        application.setJobUrl(request.getJobUrl());
+        application.setSource(request.getSource());
+
+        if (request.getStatus() != null) {
+            application.setStatus(request.getStatus());
+        }
+
+        application.setAppliedDate(request.getAppliedDate());
+        application.setDeadline(request.getDeadline());
+        application.setDescription(request.getDescription());
+
+        JobApplication updatedApplication = jobApplicationRepository.save(application);
+
+        return mapToResponse(updatedApplication);
+    }
+
+    public void deleteApplication(Long id, String userEmail) {
+
+        JobApplication application =
+                jobApplicationRepository
+                        .findByIdAndUser_Email(id, userEmail)
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        jobApplicationRepository.delete(application);
     }
 
     private JobApplicationResponse mapToResponse(JobApplication application) {

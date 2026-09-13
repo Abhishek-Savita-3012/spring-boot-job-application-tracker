@@ -2,6 +2,7 @@ package com.abhishek.jobtracker.controller;
 
 import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
 import com.abhishek.jobtracker.dto.JobApplicationResponse;
+import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
 import com.abhishek.jobtracker.service.JobApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -54,5 +55,33 @@ public class JobApplicationController {
         JobApplicationResponse response = jobApplicationService.getApplicationById(id, userEmail);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<JobApplicationResponse> updateApplication(@PathVariable Long id, @Valid @RequestBody UpdateJobApplicationRequest request, Authentication authentication) {
+
+        String userEmail = authentication.getName();
+
+        JobApplicationResponse response =
+                jobApplicationService.updateApplication(
+                        id,
+                        request,
+                        userEmail
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteApplication(@PathVariable Long id, Authentication authentication) {
+
+        String userEmail = authentication.getName();
+
+        jobApplicationService.deleteApplication(
+                id,
+                userEmail
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }
