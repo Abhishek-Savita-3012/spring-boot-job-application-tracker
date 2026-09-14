@@ -78,4 +78,20 @@ public class JobApplicationController {
                         .getStatusHistory(id)
         );
     }
+
+    @PatchMapping("/{id}/resume/{resumeId}")
+    public ResponseEntity<JobApplicationResponse> attachResume(@PathVariable Long id, @PathVariable Long resumeId) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.attachResume(id, resumeId)
+        );
+    }
+
+    @DeleteMapping("/{id}/resume")
+    public ResponseEntity<JobApplicationResponse> detachResume(@PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.detachResume(id)
+        );
+    }
 }

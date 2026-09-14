@@ -64,6 +64,10 @@ public class JobApplication {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resume_id")
+    private Resume resumeUsed;
+
     @PrePersist
     protected void onCreate() {
 

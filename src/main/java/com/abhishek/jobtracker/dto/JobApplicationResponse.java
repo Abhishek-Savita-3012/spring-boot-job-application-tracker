@@ -33,6 +33,9 @@ public class JobApplicationResponse {
     private LocalDate appliedDate;
     private LocalDate deadline;
 
+    private Long resumeId;
+    private String resumeLabel;
+
     private String description;
 
     private LocalDateTime createdAt;

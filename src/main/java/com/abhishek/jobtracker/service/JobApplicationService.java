@@ -7,17 +7,15 @@ import com.abhishek.jobtracker.entity.ApplicationStatus;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.StatusHistory;
 import com.abhishek.jobtracker.entity.User;
-import com.abhishek.jobtracker.repository.ApplicationNoteRepository;
-import com.abhishek.jobtracker.repository.InterviewRoundRepository;
-import com.abhishek.jobtracker.repository.JobApplicationRepository;
-import com.abhishek.jobtracker.repository.StatusHistoryRepository;
+import com.abhishek.jobtracker.repository.*;
 import com.abhishek.jobtracker.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import com.abhishek.jobtracker.dto.StatusHistoryResponse;
-import java.util.List;
+import com.abhishek.jobtracker.entity.Resume;
+import com.abhishek.jobtracker.repository.ResumeRepository;
 
 @Service
 public class JobApplicationService {
@@ -27,13 +25,15 @@ public class JobApplicationService {
     private final StatusHistoryRepository statusHistoryRepository;
     private final InterviewRoundRepository interviewRoundRepository;
     private final ApplicationNoteRepository applicationNoteRepository;
+    private final ResumeRepository resumeRepository;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository, ApplicationNoteRepository applicationNoteRepository) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository, ApplicationNoteRepository applicationNoteRepository, ResumeRepository resumeRepository) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.currentUserService = currentUserService;
         this.statusHistoryRepository = statusHistoryRepository;
         this.interviewRoundRepository = interviewRoundRepository;
         this.applicationNoteRepository = applicationNoteRepository;
+        this.resumeRepository = resumeRepository;
     }
 
     @Transactional
@@ -208,7 +208,52 @@ public class JobApplicationService {
         );
     }
 
+    public JobApplicationResponse attachResume(Long applicationId, Long resumeId) {
+
+        User user = currentUserService.getCurrentUser();
+
+        JobApplication application = jobApplicationRepository.findByIdAndUser_Id(applicationId, user.getId())
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        Resume resume = resumeRepository.findByIdAndUser_Id(resumeId, user.getId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Resume not found"
+                                )
+                        );
+
+        application.setResumeUsed(resume);
+
+        JobApplication updatedApplication = jobApplicationRepository.save(application);
+
+        return mapToResponse(updatedApplication);
+    }
+
+    public JobApplicationResponse detachResume(Long applicationId) {
+
+        User user = currentUserService.getCurrentUser();
+
+        JobApplication application = jobApplicationRepository.findByIdAndUser_Id(applicationId, user.getId())
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        application.setResumeUsed(null);
+
+        JobApplication updatedApplication = jobApplicationRepository.save(application);
+
+        return mapToResponse(updatedApplication);
+    }
+
     private JobApplicationResponse mapToResponse(JobApplication application) {
+
+        Resume resume = application.getResumeUsed();
 
         return new JobApplicationResponse(
                 application.getId(),
@@ -224,6 +269,10 @@ public class JobApplicationService {
                 application.getStatus(),
                 application.getAppliedDate(),
                 application.getDeadline(),
+
+                resume != null ? resume.getId() : null,
+                resume != null ? resume.getLabel() : null,
+
                 application.getDescription(),
                 application.getCreatedAt(),
                 application.getUpdatedAt()
