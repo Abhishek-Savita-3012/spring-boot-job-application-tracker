@@ -3,6 +3,7 @@ package com.abhishek.jobtracker.service;
 import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
 import com.abhishek.jobtracker.dto.JobApplicationResponse;
 import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
+import com.abhishek.jobtracker.entity.ApplicationStatus;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
@@ -120,6 +121,24 @@ public class JobApplicationService {
                         );
 
         jobApplicationRepository.delete(application);
+    }
+
+    public JobApplicationResponse updateStatus(Long id, ApplicationStatus newStatus) {
+
+        User user = currentUserService.getCurrentUser();
+
+        JobApplication application = jobApplicationRepository.findByIdAndUser_Id(id, user.getId())
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        application.setStatus(newStatus);
+
+        JobApplication updatedApplication = jobApplicationRepository.save(application);
+
+        return mapToResponse(updatedApplication);
     }
 
     private JobApplicationResponse mapToResponse(JobApplication application) {

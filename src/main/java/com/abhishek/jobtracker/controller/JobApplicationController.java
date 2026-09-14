@@ -3,6 +3,7 @@ package com.abhishek.jobtracker.controller;
 import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
 import com.abhishek.jobtracker.dto.JobApplicationResponse;
 import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
+import com.abhishek.jobtracker.dto.UpdateStatusRequest;
 import com.abhishek.jobtracker.service.JobApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -63,5 +64,13 @@ public class JobApplicationController {
         jobApplicationService.deleteApplication(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<JobApplicationResponse> updateStatus(@PathVariable Long id, @Valid @RequestBody UpdateStatusRequest request) {
+
+        JobApplicationResponse response = jobApplicationService.updateStatus(id, request.getStatus());
+
+        return ResponseEntity.ok(response);
     }
 }
