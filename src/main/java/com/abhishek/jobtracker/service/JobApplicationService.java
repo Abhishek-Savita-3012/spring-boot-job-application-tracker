@@ -7,6 +7,7 @@ import com.abhishek.jobtracker.entity.ApplicationStatus;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.StatusHistory;
 import com.abhishek.jobtracker.entity.User;
+import com.abhishek.jobtracker.repository.InterviewRoundRepository;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
 import com.abhishek.jobtracker.repository.StatusHistoryRepository;
 import com.abhishek.jobtracker.security.CurrentUserService;
@@ -23,11 +24,13 @@ public class JobApplicationService {
     private final JobApplicationRepository jobApplicationRepository;
     private final CurrentUserService currentUserService;
     private final StatusHistoryRepository statusHistoryRepository;
+    private final InterviewRoundRepository interviewRoundRepository;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.currentUserService = currentUserService;
         this.statusHistoryRepository = statusHistoryRepository;
+        this.interviewRoundRepository = interviewRoundRepository;
     }
 
     @Transactional
@@ -134,6 +137,7 @@ public class JobApplicationService {
                                 )
                         );
 
+        interviewRoundRepository.deleteAllByJobApplication_Id(id);
         statusHistoryRepository.deleteAllByJobApplication_Id(id);
 
         jobApplicationRepository.delete(application);
