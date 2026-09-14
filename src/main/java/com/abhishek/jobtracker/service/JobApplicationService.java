@@ -5,11 +5,16 @@ import com.abhishek.jobtracker.dto.JobApplicationResponse;
 import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
 import com.abhishek.jobtracker.entity.ApplicationStatus;
 import com.abhishek.jobtracker.entity.JobApplication;
+import com.abhishek.jobtracker.entity.StatusHistory;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
+import com.abhishek.jobtracker.repository.StatusHistoryRepository;
 import com.abhishek.jobtracker.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
+import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
+import com.abhishek.jobtracker.dto.StatusHistoryResponse;
 import java.util.List;
 
 @Service
@@ -17,12 +22,15 @@ public class JobApplicationService {
 
     private final JobApplicationRepository jobApplicationRepository;
     private final CurrentUserService currentUserService;
+    private final StatusHistoryRepository statusHistoryRepository;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.currentUserService = currentUserService;
+        this.statusHistoryRepository = statusHistoryRepository;
     }
 
+    @Transactional
     public JobApplicationResponse createApplication(CreateJobApplicationRequest request) {
 
         User user = currentUserService.getCurrentUser();
@@ -45,6 +53,15 @@ public class JobApplicationService {
                 .build();
 
         JobApplication savedApplication = jobApplicationRepository.save(application);
+
+        StatusHistory initialHistory =
+                StatusHistory.builder()
+                        .oldStatus(null)
+                        .newStatus(savedApplication.getStatus())
+                        .jobApplication(savedApplication)
+                        .build();
+
+        statusHistoryRepository.save(initialHistory);
 
         return mapToResponse(savedApplication);
     }
@@ -96,10 +113,6 @@ public class JobApplicationService {
         application.setJobUrl(request.getJobUrl());
         application.setSource(request.getSource());
 
-        if (request.getStatus() != null) {
-            application.setStatus(request.getStatus());
-        }
-
         application.setAppliedDate(request.getAppliedDate());
         application.setDeadline(request.getDeadline());
         application.setDescription(request.getDescription());
@@ -109,6 +122,7 @@ public class JobApplicationService {
         return mapToResponse(updatedApplication);
     }
 
+    @Transactional
     public void deleteApplication(Long id) {
 
         User user = currentUserService.getCurrentUser();
@@ -120,9 +134,12 @@ public class JobApplicationService {
                                 )
                         );
 
+        statusHistoryRepository.deleteAllByJobApplication_Id(id);
+
         jobApplicationRepository.delete(application);
     }
 
+    @Transactional
     public JobApplicationResponse updateStatus(Long id, ApplicationStatus newStatus) {
 
         User user = currentUserService.getCurrentUser();
@@ -134,11 +151,54 @@ public class JobApplicationService {
                                 )
                         );
 
+        ApplicationStatus oldStatus = application.getStatus();
+
+        if (oldStatus == newStatus) {
+            return mapToResponse(application);
+        }
+
         application.setStatus(newStatus);
 
         JobApplication updatedApplication = jobApplicationRepository.save(application);
 
+        StatusHistory history =
+                StatusHistory.builder()
+                        .oldStatus(oldStatus)
+                        .newStatus(newStatus)
+                        .jobApplication(updatedApplication)
+                        .build();
+
+        statusHistoryRepository.save(history);
+
         return mapToResponse(updatedApplication);
+    }
+
+    public List<StatusHistoryResponse> getStatusHistory(Long applicationId) {
+
+        User user = currentUserService.getCurrentUser();
+
+        jobApplicationRepository.findByIdAndUser_Id(applicationId, user.getId())
+                .orElseThrow(() ->
+                        new ApplicationNotFoundException(
+                                "Job application not found"
+                        )
+                );
+
+        return statusHistoryRepository
+                .findAllByJobApplication_IdOrderByChangedAtAsc(applicationId)
+                .stream()
+                .map(this::mapHistoryToResponse)
+                .toList();
+    }
+
+    private StatusHistoryResponse mapHistoryToResponse(StatusHistory history) {
+
+        return new StatusHistoryResponse(
+                history.getId(),
+                history.getOldStatus(),
+                history.getNewStatus(),
+                history.getChangedAt()
+        );
     }
 
     private JobApplicationResponse mapToResponse(JobApplication application) {

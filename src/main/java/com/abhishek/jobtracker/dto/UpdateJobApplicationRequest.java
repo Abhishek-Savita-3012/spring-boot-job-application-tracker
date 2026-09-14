@@ -1,6 +1,5 @@
 package com.abhishek.jobtracker.dto;
 
-import com.abhishek.jobtracker.entity.ApplicationStatus;
 import com.abhishek.jobtracker.entity.EmploymentType;
 import com.abhishek.jobtracker.entity.WorkMode;
 import jakarta.validation.constraints.NotBlank;
@@ -37,8 +36,6 @@ public class UpdateJobApplicationRequest {
     private String jobUrl;
 
     private String source;
-
-    private ApplicationStatus status;
 
     private LocalDate appliedDate;
 
