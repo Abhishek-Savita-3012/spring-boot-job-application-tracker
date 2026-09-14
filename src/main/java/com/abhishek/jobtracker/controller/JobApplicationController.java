@@ -7,7 +7,6 @@ import com.abhishek.jobtracker.service.JobApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -22,15 +21,9 @@ public class JobApplicationController {
     }
 
     @PostMapping
-    public ResponseEntity<JobApplicationResponse> createApplication(@Valid @RequestBody CreateJobApplicationRequest request, Authentication authentication) {
+    public ResponseEntity<JobApplicationResponse> createApplication(@Valid @RequestBody CreateJobApplicationRequest request) {
 
-        String userEmail = authentication.getName();
-
-        JobApplicationResponse response =
-                jobApplicationService.createApplication(
-                        request,
-                        userEmail
-                );
+        JobApplicationResponse response = jobApplicationService.createApplication(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -38,49 +31,36 @@ public class JobApplicationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<JobApplicationResponse>> getAllApplications(Authentication authentication) {
+    public ResponseEntity<List<JobApplicationResponse>> getAllApplications() {
 
-        String userEmail = authentication.getName();
-
-        List<JobApplicationResponse> applications = jobApplicationService.getAllApplications(userEmail);
-
-        return ResponseEntity.ok(applications);
+        return ResponseEntity.ok(
+                jobApplicationService.getAllApplications()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<JobApplicationResponse> getApplicationById(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<JobApplicationResponse> getApplicationById(@PathVariable Long id) {
 
-        String userEmail = authentication.getName();
-
-        JobApplicationResponse response = jobApplicationService.getApplicationById(id, userEmail);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                jobApplicationService.getApplicationById(id)
+        );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<JobApplicationResponse> updateApplication(@PathVariable Long id, @Valid @RequestBody UpdateJobApplicationRequest request, Authentication authentication) {
+    public ResponseEntity<JobApplicationResponse> updateApplication(@PathVariable Long id, @Valid @RequestBody UpdateJobApplicationRequest request) {
 
-        String userEmail = authentication.getName();
-
-        JobApplicationResponse response =
+        return ResponseEntity.ok(
                 jobApplicationService.updateApplication(
                         id,
-                        request,
-                        userEmail
-                );
-
-        return ResponseEntity.ok(response);
+                        request
+                )
+        );
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteApplication(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<Void> deleteApplication(@PathVariable Long id) {
 
-        String userEmail = authentication.getName();
-
-        jobApplicationService.deleteApplication(
-                id,
-                userEmail
-        );
+        jobApplicationService.deleteApplication(id);
 
         return ResponseEntity.noContent().build();
     }

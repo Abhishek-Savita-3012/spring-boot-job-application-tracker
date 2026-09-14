@@ -6,7 +6,7 @@ import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
-import com.abhishek.jobtracker.repository.UserRepository;
+import com.abhishek.jobtracker.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
 import java.util.List;
@@ -15,19 +15,16 @@ import java.util.List;
 public class JobApplicationService {
 
     private final JobApplicationRepository jobApplicationRepository;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, UserRepository userRepository) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService) {
         this.jobApplicationRepository = jobApplicationRepository;
-        this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
-    public JobApplicationResponse createApplication(CreateJobApplicationRequest request, String userEmail) {
+    public JobApplicationResponse createApplication(CreateJobApplicationRequest request) {
 
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() ->
-                        new RuntimeException("User not found")
-                );
+        User user = currentUserService.getCurrentUser();
 
         JobApplication application = JobApplication.builder()
                 .company(request.getCompany())
@@ -51,20 +48,23 @@ public class JobApplicationService {
         return mapToResponse(savedApplication);
     }
 
-    public List<JobApplicationResponse> getAllApplications(String userEmail) {
+    public List<JobApplicationResponse> getAllApplications() {
+
+        User user = currentUserService.getCurrentUser();
 
         return jobApplicationRepository
-                .findAllByUser_Email(userEmail)
+                .findAllByUser_Id(user.getId())
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    public JobApplicationResponse getApplicationById(Long id, String userEmail) {
+    public JobApplicationResponse getApplicationById(Long id) {
+
+        User user = currentUserService.getCurrentUser();
 
         JobApplication application =
-                jobApplicationRepository
-                        .findByIdAndUser_Email(id, userEmail)
+                jobApplicationRepository.findByIdAndUser_Id(id, user.getId())
                         .orElseThrow(() ->
                                 new ApplicationNotFoundException(
                                         "Job application not found"
@@ -74,11 +74,11 @@ public class JobApplicationService {
         return mapToResponse(application);
     }
 
-    public JobApplicationResponse updateApplication(Long id, UpdateJobApplicationRequest request, String userEmail) {
+    public JobApplicationResponse updateApplication(Long id, UpdateJobApplicationRequest request) {
 
-        JobApplication application =
-                jobApplicationRepository
-                        .findByIdAndUser_Email(id, userEmail)
+        User user = currentUserService.getCurrentUser();
+
+        JobApplication application = jobApplicationRepository.findByIdAndUser_Id(id, user.getId())
                         .orElseThrow(() ->
                                 new ApplicationNotFoundException(
                                         "Job application not found"
@@ -108,11 +108,11 @@ public class JobApplicationService {
         return mapToResponse(updatedApplication);
     }
 
-    public void deleteApplication(Long id, String userEmail) {
+    public void deleteApplication(Long id) {
 
-        JobApplication application =
-                jobApplicationRepository
-                        .findByIdAndUser_Email(id, userEmail)
+        User user = currentUserService.getCurrentUser();
+
+        JobApplication application = jobApplicationRepository.findByIdAndUser_Id(id, user.getId())
                         .orElseThrow(() ->
                                 new ApplicationNotFoundException(
                                         "Job application not found"

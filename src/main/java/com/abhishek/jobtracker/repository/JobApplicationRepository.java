@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
-    List<JobApplication> findAllByUser_Email(String email);
+    List<JobApplication> findAllByUser_Id(Long userId);
 
-    Optional<JobApplication> findByIdAndUser_Email(
+    Optional<JobApplication> findByIdAndUser_Id(
             Long id,
-            String email
+            Long userId
     );
 }
