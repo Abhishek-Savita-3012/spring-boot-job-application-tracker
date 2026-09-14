@@ -7,6 +7,7 @@ import com.abhishek.jobtracker.entity.ApplicationStatus;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.StatusHistory;
 import com.abhishek.jobtracker.entity.User;
+import com.abhishek.jobtracker.repository.ApplicationNoteRepository;
 import com.abhishek.jobtracker.repository.InterviewRoundRepository;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
 import com.abhishek.jobtracker.repository.StatusHistoryRepository;
@@ -25,12 +26,14 @@ public class JobApplicationService {
     private final CurrentUserService currentUserService;
     private final StatusHistoryRepository statusHistoryRepository;
     private final InterviewRoundRepository interviewRoundRepository;
+    private final ApplicationNoteRepository applicationNoteRepository;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository, ApplicationNoteRepository applicationNoteRepository) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.currentUserService = currentUserService;
         this.statusHistoryRepository = statusHistoryRepository;
         this.interviewRoundRepository = interviewRoundRepository;
+        this.applicationNoteRepository = applicationNoteRepository;
     }
 
     @Transactional
@@ -137,9 +140,9 @@ public class JobApplicationService {
                                 )
                         );
 
+        applicationNoteRepository.deleteAllByJobApplication_Id(id);
         interviewRoundRepository.deleteAllByJobApplication_Id(id);
         statusHistoryRepository.deleteAllByJobApplication_Id(id);
-
         jobApplicationRepository.delete(application);
     }
 
