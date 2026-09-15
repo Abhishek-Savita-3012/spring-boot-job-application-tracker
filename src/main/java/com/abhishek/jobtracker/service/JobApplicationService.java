@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.abhishek.jobtracker.dto.StatusHistoryResponse;
 import com.abhishek.jobtracker.repository.ResumeRepository;
 import com.abhishek.jobtracker.specification.JobApplicationSpecification;
+import com.abhishek.jobtracker.exception.InvalidSortException;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class JobApplicationService {
@@ -296,7 +298,9 @@ public class JobApplicationService {
             String keyword,
             ApplicationStatus status,
             WorkMode workMode,
-            EmploymentType employmentType
+            EmploymentType employmentType,
+            String sortBy,
+            String direction
     ) {
 
         User user = currentUserService.getCurrentUser();
@@ -310,10 +314,50 @@ public class JobApplicationService {
                         employmentType
                 );
 
+        Sort sort = buildSort(sortBy, direction);
+
         return jobApplicationRepository
-                .findAll(specification)
+                .findAll(specification, sort)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    private Sort buildSort(String sortBy, String direction) {
+
+        String sortField = switch (sortBy) {
+
+            case "createdAt" -> "createdAt";
+            case "updatedAt" -> "updatedAt";
+            case "company" -> "company";
+            case "role" -> "role";
+            case "salary" -> "salary";
+            case "appliedDate" -> "appliedDate";
+            case "deadline" -> "deadline";
+            case "status" -> "status";
+
+            default -> throw new InvalidSortException(
+                    "Invalid sort field: " + sortBy
+            );
+        };
+
+        Sort.Direction sortDirection;
+
+        if ("asc".equalsIgnoreCase(direction)) {
+
+            sortDirection = Sort.Direction.ASC;
+
+        } else if ("desc".equalsIgnoreCase(direction)) {
+
+            sortDirection = Sort.Direction.DESC;
+
+        } else {
+
+            throw new InvalidSortException(
+                    "Sort direction must be 'asc' or 'desc'"
+            );
+        }
+
+        return Sort.by(sortDirection, sortField);
     }
 }

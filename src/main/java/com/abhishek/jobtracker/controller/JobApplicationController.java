@@ -107,8 +107,7 @@ public class JobApplicationController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<JobApplicationResponse>>
-    filterApplications(
+    public ResponseEntity<List<JobApplicationResponse>> filterApplications(
 
             @RequestParam(required = false)
             String keyword,
@@ -120,7 +119,13 @@ public class JobApplicationController {
             WorkMode workMode,
 
             @RequestParam(required = false)
-            EmploymentType employmentType
+            EmploymentType employmentType,
+
+            @RequestParam(defaultValue = "createdAt")
+            String sortBy,
+
+            @RequestParam(defaultValue = "desc")
+            String direction
     ) {
 
         return ResponseEntity.ok(
@@ -128,7 +133,9 @@ public class JobApplicationController {
                         keyword,
                         status,
                         workMode,
-                        employmentType
+                        employmentType,
+                        sortBy,
+                        direction
                 )
         );
     }
