@@ -85,14 +85,16 @@ public class FollowUpReminderService {
         getOwnedApplication(applicationId);
 
         FollowUpReminder reminder = reminderRepository.findByIdAndJobApplication_Id(reminderId, applicationId)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Reminder not found"
-                        )
-                );
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Reminder not found"
+                                )
+                        );
 
         reminder.setRemindAt(request.getRemindAt());
         reminder.setMessage(request.getMessage());
+        reminder.setNotifiedAt(null);
+        reminder.setStatus(ReminderStatus.PENDING);
 
         FollowUpReminder updatedReminder = reminderRepository.save(reminder);
 
@@ -156,6 +158,7 @@ public class FollowUpReminderService {
                 reminder.getRemindAt(),
                 reminder.getMessage(),
                 reminder.getStatus(),
+                reminder.getNotifiedAt(),
                 reminder.getCreatedAt(),
                 reminder.getUpdatedAt()
         );

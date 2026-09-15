@@ -18,6 +18,8 @@ public class FollowUpReminderResponse {
 
     private ReminderStatus status;
 
+    private LocalDateTime notifiedAt;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

@@ -28,6 +28,8 @@ public class FollowUpReminder {
     @Column(nullable = false)
     private ReminderStatus status;
 
+    private LocalDateTime notifiedAt;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
