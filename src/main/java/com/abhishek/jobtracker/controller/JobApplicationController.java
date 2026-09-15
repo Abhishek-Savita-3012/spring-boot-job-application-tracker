@@ -94,4 +94,12 @@ public class JobApplicationController {
                 jobApplicationService.detachResume(id)
         );
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<JobApplicationResponse>> searchApplications(@RequestParam(required = false) String keyword) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.searchApplications(keyword)
+        );
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.abhishek.jobtracker.dto.StatusHistoryResponse;
 import com.abhishek.jobtracker.entity.Resume;
 import com.abhishek.jobtracker.repository.ResumeRepository;
+import com.abhishek.jobtracker.specification.JobApplicationSpecification;
 
 @Service
 public class JobApplicationService {
@@ -280,5 +281,20 @@ public class JobApplicationService {
                 application.getCreatedAt(),
                 application.getUpdatedAt()
         );
+    }
+
+    public List<JobApplicationResponse> searchApplications(String keyword) {
+
+        User user = currentUserService.getCurrentUser();
+
+        var specification =
+                JobApplicationSpecification
+                        .belongsToUserAndMatchesKeyword(user.getId(), keyword);
+
+        return jobApplicationRepository
+                .findAll(specification)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 }
