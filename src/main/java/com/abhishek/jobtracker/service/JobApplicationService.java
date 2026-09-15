@@ -3,10 +3,7 @@ package com.abhishek.jobtracker.service;
 import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
 import com.abhishek.jobtracker.dto.JobApplicationResponse;
 import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
-import com.abhishek.jobtracker.entity.ApplicationStatus;
-import com.abhishek.jobtracker.entity.JobApplication;
-import com.abhishek.jobtracker.entity.StatusHistory;
-import com.abhishek.jobtracker.entity.User;
+import com.abhishek.jobtracker.entity.*;
 import com.abhishek.jobtracker.repository.*;
 import com.abhishek.jobtracker.security.CurrentUserService;
 import org.springframework.stereotype.Service;
@@ -14,7 +11,6 @@ import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import com.abhishek.jobtracker.dto.StatusHistoryResponse;
-import com.abhishek.jobtracker.entity.Resume;
 import com.abhishek.jobtracker.repository.ResumeRepository;
 import com.abhishek.jobtracker.specification.JobApplicationSpecification;
 
@@ -287,9 +283,32 @@ public class JobApplicationService {
 
         User user = currentUserService.getCurrentUser();
 
+        var specification = JobApplicationSpecification.withFilters(user.getId(), keyword, null, null, null);
+
+        return jobApplicationRepository
+                .findAll(specification)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    public List<JobApplicationResponse> filterApplications(
+            String keyword,
+            ApplicationStatus status,
+            WorkMode workMode,
+            EmploymentType employmentType
+    ) {
+
+        User user = currentUserService.getCurrentUser();
+
         var specification =
-                JobApplicationSpecification
-                        .belongsToUserAndMatchesKeyword(user.getId(), keyword);
+                JobApplicationSpecification.withFilters(
+                        user.getId(),
+                        keyword,
+                        status,
+                        workMode,
+                        employmentType
+                );
 
         return jobApplicationRepository
                 .findAll(specification)

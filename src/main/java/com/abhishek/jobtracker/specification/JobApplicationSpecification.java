@@ -1,8 +1,14 @@
 package com.abhishek.jobtracker.specification;
 
+import com.abhishek.jobtracker.entity.ApplicationStatus;
+import com.abhishek.jobtracker.entity.EmploymentType;
 import com.abhishek.jobtracker.entity.JobApplication;
+import com.abhishek.jobtracker.entity.WorkMode;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class JobApplicationSpecification {
@@ -10,70 +16,127 @@ public class JobApplicationSpecification {
     private JobApplicationSpecification() {
     }
 
-    public static Specification<JobApplication> belongsToUserAndMatchesKeyword(Long userId, String keyword) {
+    public static Specification<JobApplication> withFilters(
+            Long userId,
+            String keyword,
+            ApplicationStatus status,
+            WorkMode workMode,
+            EmploymentType employmentType
+    ) {
 
         return (root, query, criteriaBuilder) -> {
 
-            var belongsToUser =
+            List<Predicate> predicates = new ArrayList<>();
+
+            /*
+             * Security condition:
+             * Always restrict results to current user.
+             */
+            predicates.add(
                     criteriaBuilder.equal(
                             root.get("user").get("id"),
                             userId
-                    );
+                    )
+            );
 
-            if (keyword == null || keyword.isBlank()) {
-                return belongsToUser;
+            /*
+             * Keyword search
+             */
+            if (keyword != null
+                    && !keyword.isBlank()) {
+
+                String searchPattern =
+                        "%"
+                                + keyword
+                                .trim()
+                                .toLowerCase(Locale.ROOT)
+                                + "%";
+
+                Predicate companyMatches =
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("company")
+                                ),
+                                searchPattern
+                        );
+
+                Predicate roleMatches =
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("role")
+                                ),
+                                searchPattern
+                        );
+
+                Predicate locationMatches =
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("location")
+                                ),
+                                searchPattern
+                        );
+
+                Predicate sourceMatches =
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(
+                                        root.get("source")
+                                ),
+                                searchPattern
+                        );
+
+                predicates.add(
+                        criteriaBuilder.or(
+                                companyMatches,
+                                roleMatches,
+                                locationMatches,
+                                sourceMatches
+                        )
+                );
             }
 
-            String searchPattern =
-                    "%" +
-                            keyword
-                                    .trim()
-                                    .toLowerCase(Locale.ROOT)
-                            + "%";
+            /*
+             * Status filter
+             */
+            if (status != null) {
 
-            var companyMatches =
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(
-                                    root.get("company")
-                            ),
-                            searchPattern
-                    );
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("status"),
+                                status
+                        )
+                );
+            }
 
-            var roleMatches =
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(
-                                    root.get("role")
-                            ),
-                            searchPattern
-                    );
+            /*
+             * Work mode filter
+             */
+            if (workMode != null) {
 
-            var locationMatches =
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(
-                                    root.get("location")
-                            ),
-                            searchPattern
-                    );
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("workMode"),
+                                workMode
+                        )
+                );
+            }
 
-            var sourceMatches =
-                    criteriaBuilder.like(
-                            criteriaBuilder.lower(
-                                    root.get("source")
-                            ),
-                            searchPattern
-                    );
+            /*
+             * Employment type filter
+             */
+            if (employmentType != null) {
 
-            var keywordMatches =
-                    criteriaBuilder.or(
-                            companyMatches,
-                            roleMatches,
-                            locationMatches,
-                            sourceMatches
-                    );
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("employmentType"),
+                                employmentType
+                        )
+                );
+            }
 
             return criteriaBuilder.and(
-                    belongsToUser,
-                    keywordMatches
+                    predicates.toArray(
+                            new Predicate[0]
+                    )
             );
         };
     }

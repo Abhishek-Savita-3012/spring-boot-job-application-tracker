@@ -1,6 +1,9 @@
 package com.abhishek.jobtracker.controller;
 
 import com.abhishek.jobtracker.dto.*;
+import com.abhishek.jobtracker.entity.ApplicationStatus;
+import com.abhishek.jobtracker.entity.EmploymentType;
+import com.abhishek.jobtracker.entity.WorkMode;
 import com.abhishek.jobtracker.service.JobApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -100,6 +103,33 @@ public class JobApplicationController {
 
         return ResponseEntity.ok(
                 jobApplicationService.searchApplications(keyword)
+        );
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<JobApplicationResponse>>
+    filterApplications(
+
+            @RequestParam(required = false)
+            String keyword,
+
+            @RequestParam(required = false)
+            ApplicationStatus status,
+
+            @RequestParam(required = false)
+            WorkMode workMode,
+
+            @RequestParam(required = false)
+            EmploymentType employmentType
+    ) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.filterApplications(
+                        keyword,
+                        status,
+                        workMode,
+                        employmentType
+                )
         );
     }
 }
