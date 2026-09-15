@@ -15,6 +15,13 @@ import com.abhishek.jobtracker.repository.ResumeRepository;
 import com.abhishek.jobtracker.specification.JobApplicationSpecification;
 import com.abhishek.jobtracker.exception.InvalidSortException;
 import org.springframework.data.domain.Sort;
+import com.abhishek.jobtracker.dto.PageResponse;
+import com.abhishek.jobtracker.exception.InvalidPaginationException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class JobApplicationService {
@@ -71,17 +78,6 @@ public class JobApplicationService {
         statusHistoryRepository.save(initialHistory);
 
         return mapToResponse(savedApplication);
-    }
-
-    public List<JobApplicationResponse> getAllApplications() {
-
-        User user = currentUserService.getCurrentUser();
-
-        return jobApplicationRepository
-                .findAllByUser_Id(user.getId())
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
     }
 
     public JobApplicationResponse getApplicationById(Long id) {
@@ -281,48 +277,6 @@ public class JobApplicationService {
         );
     }
 
-    public List<JobApplicationResponse> searchApplications(String keyword) {
-
-        User user = currentUserService.getCurrentUser();
-
-        var specification = JobApplicationSpecification.withFilters(user.getId(), keyword, null, null, null);
-
-        return jobApplicationRepository
-                .findAll(specification)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    public List<JobApplicationResponse> filterApplications(
-            String keyword,
-            ApplicationStatus status,
-            WorkMode workMode,
-            EmploymentType employmentType,
-            String sortBy,
-            String direction
-    ) {
-
-        User user = currentUserService.getCurrentUser();
-
-        var specification =
-                JobApplicationSpecification.withFilters(
-                        user.getId(),
-                        keyword,
-                        status,
-                        workMode,
-                        employmentType
-                );
-
-        Sort sort = buildSort(sortBy, direction);
-
-        return jobApplicationRepository
-                .findAll(specification, sort)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
     private Sort buildSort(String sortBy, String direction) {
 
         String sortField = switch (sortBy) {
@@ -359,5 +313,69 @@ public class JobApplicationService {
         }
 
         return Sort.by(sortDirection, sortField);
+    }
+
+    public PageResponse<JobApplicationResponse> getApplications(
+            String keyword,
+            ApplicationStatus status,
+            WorkMode workMode,
+            EmploymentType employmentType,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    ) {
+
+        validatePagination(page, size);
+
+        User user =
+                currentUserService.getCurrentUser();
+
+        var specification =
+                JobApplicationSpecification.withFilters(
+                        user.getId(),
+                        keyword,
+                        status,
+                        workMode,
+                        employmentType
+                );
+
+        Sort sort = buildSort(sortBy, direction);
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<JobApplication> applicationPage = jobApplicationRepository.findAll(specification, pageable);
+
+        List<JobApplicationResponse> content =
+                applicationPage
+                        .getContent()
+                        .stream()
+                        .map(this::mapToResponse)
+                        .toList();
+
+        return new PageResponse<>(
+                content,
+                applicationPage.getNumber(),
+                applicationPage.getSize(),
+                applicationPage.getTotalElements(),
+                applicationPage.getTotalPages(),
+                applicationPage.isFirst(),
+                applicationPage.isLast()
+        );
+    }
+
+    private void validatePagination(int page, int size) {
+
+        if (page < 0) {
+            throw new InvalidPaginationException(
+                    "Page number cannot be negative"
+            );
+        }
+
+        if (size < 1 || size > 100) {
+            throw new InvalidPaginationException(
+                    "Page size must be between 1 and 100"
+            );
+        }
     }
 }

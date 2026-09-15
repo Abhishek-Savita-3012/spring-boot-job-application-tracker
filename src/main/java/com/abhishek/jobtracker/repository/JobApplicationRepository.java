@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long>, JpaSpecificationExecutor<JobApplication> {
-    List<JobApplication> findAllByUser_Id(Long userId);
 
     Optional<JobApplication> findByIdAndUser_Id(
             Long id,

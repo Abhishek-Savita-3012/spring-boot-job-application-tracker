@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import com.abhishek.jobtracker.dto.PageResponse;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -32,10 +33,44 @@ public class JobApplicationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<JobApplicationResponse>> getAllApplications() {
+    public ResponseEntity<PageResponse<JobApplicationResponse>> getApplications(
+
+            @RequestParam(required = false)
+            String keyword,
+
+            @RequestParam(required = false)
+            ApplicationStatus status,
+
+            @RequestParam(required = false)
+            WorkMode workMode,
+
+            @RequestParam(required = false)
+            EmploymentType employmentType,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size,
+
+            @RequestParam(defaultValue = "createdAt")
+            String sortBy,
+
+            @RequestParam(defaultValue = "desc")
+            String direction
+    ) {
 
         return ResponseEntity.ok(
-                jobApplicationService.getAllApplications()
+                jobApplicationService.getApplications(
+                        keyword,
+                        status,
+                        workMode,
+                        employmentType,
+                        page,
+                        size,
+                        sortBy,
+                        direction
+                )
         );
     }
 
@@ -95,48 +130,6 @@ public class JobApplicationController {
 
         return ResponseEntity.ok(
                 jobApplicationService.detachResume(id)
-        );
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<JobApplicationResponse>> searchApplications(@RequestParam(required = false) String keyword) {
-
-        return ResponseEntity.ok(
-                jobApplicationService.searchApplications(keyword)
-        );
-    }
-
-    @GetMapping("/filter")
-    public ResponseEntity<List<JobApplicationResponse>> filterApplications(
-
-            @RequestParam(required = false)
-            String keyword,
-
-            @RequestParam(required = false)
-            ApplicationStatus status,
-
-            @RequestParam(required = false)
-            WorkMode workMode,
-
-            @RequestParam(required = false)
-            EmploymentType employmentType,
-
-            @RequestParam(defaultValue = "createdAt")
-            String sortBy,
-
-            @RequestParam(defaultValue = "desc")
-            String direction
-    ) {
-
-        return ResponseEntity.ok(
-                jobApplicationService.filterApplications(
-                        keyword,
-                        status,
-                        workMode,
-                        employmentType,
-                        sortBy,
-                        direction
-                )
         );
     }
 }
