@@ -26,14 +26,16 @@ public class JobApplicationService {
     private final InterviewRoundRepository interviewRoundRepository;
     private final ApplicationNoteRepository applicationNoteRepository;
     private final ResumeRepository resumeRepository;
+    private final FollowUpReminderRepository followUpReminderRepository;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository, ApplicationNoteRepository applicationNoteRepository, ResumeRepository resumeRepository) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository, ApplicationNoteRepository applicationNoteRepository, ResumeRepository resumeRepository, FollowUpReminderRepository followUpReminderRepository) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.currentUserService = currentUserService;
         this.statusHistoryRepository = statusHistoryRepository;
         this.interviewRoundRepository = interviewRoundRepository;
         this.applicationNoteRepository = applicationNoteRepository;
         this.resumeRepository = resumeRepository;
+        this.followUpReminderRepository = followUpReminderRepository;
     }
 
     @Transactional
@@ -140,6 +142,7 @@ public class JobApplicationService {
                                 )
                         );
 
+        followUpReminderRepository.deleteAllByJobApplication_Id(id);
         applicationNoteRepository.deleteAllByJobApplication_Id(id);
         interviewRoundRepository.deleteAllByJobApplication_Id(id);
         statusHistoryRepository.deleteAllByJobApplication_Id(id);
