@@ -21,7 +21,8 @@ public class JobApplicationSpecification {
             String keyword,
             ApplicationStatus status,
             WorkMode workMode,
-            EmploymentType employmentType
+            EmploymentType employmentType,
+            boolean archived
     ) {
 
         return (root, query, criteriaBuilder) -> {
@@ -36,6 +37,13 @@ public class JobApplicationSpecification {
                     criteriaBuilder.equal(
                             root.get("user").get("id"),
                             userId
+                    )
+            );
+
+            predicates.add(
+                    criteriaBuilder.equal(
+                            root.get("archived"),
+                            archived
                     )
             );
 

@@ -47,6 +47,9 @@ public class JobApplicationController {
             @RequestParam(required = false)
             EmploymentType employmentType,
 
+            @RequestParam(defaultValue = "false")
+            boolean archived,
+
             @RequestParam(defaultValue = "0")
             int page,
 
@@ -66,6 +69,7 @@ public class JobApplicationController {
                         status,
                         workMode,
                         employmentType,
+                        archived,
                         page,
                         size,
                         sortBy,
@@ -130,6 +134,22 @@ public class JobApplicationController {
 
         return ResponseEntity.ok(
                 jobApplicationService.detachResume(id)
+        );
+    }
+
+    @PatchMapping("/{id}/archive")
+    public ResponseEntity<JobApplicationResponse> archiveApplication(@PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.archiveApplication(id)
+        );
+    }
+
+    @PatchMapping("/{id}/restore")
+    public ResponseEntity<JobApplicationResponse> restoreApplication(@PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                jobApplicationService.restoreApplication(id)
         );
     }
 }

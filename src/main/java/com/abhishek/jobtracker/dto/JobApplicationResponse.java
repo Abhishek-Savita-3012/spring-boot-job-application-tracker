@@ -38,6 +38,9 @@ public class JobApplicationResponse {
 
     private String description;
 
+    private boolean archived;
+    private LocalDateTime archivedAt;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

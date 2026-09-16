@@ -8,6 +8,8 @@ import com.abhishek.jobtracker.repository.*;
 import com.abhishek.jobtracker.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import com.abhishek.jobtracker.dto.StatusHistoryResponse;
@@ -272,6 +274,8 @@ public class JobApplicationService {
                 resume != null ? resume.getLabel() : null,
 
                 application.getDescription(),
+                application.isArchived(),
+                application.getArchivedAt(),
                 application.getCreatedAt(),
                 application.getUpdatedAt()
         );
@@ -289,6 +293,7 @@ public class JobApplicationService {
             case "appliedDate" -> "appliedDate";
             case "deadline" -> "deadline";
             case "status" -> "status";
+            case "archivedAt" -> "archivedAt";
 
             default -> throw new InvalidSortException(
                     "Invalid sort field: " + sortBy
@@ -320,6 +325,7 @@ public class JobApplicationService {
             ApplicationStatus status,
             WorkMode workMode,
             EmploymentType employmentType,
+            boolean archived,
             int page,
             int size,
             String sortBy,
@@ -337,7 +343,8 @@ public class JobApplicationService {
                         keyword,
                         status,
                         workMode,
-                        employmentType
+                        employmentType,
+                        archived
                 );
 
         Sort sort = buildSort(sortBy, direction);
@@ -377,5 +384,49 @@ public class JobApplicationService {
                     "Page size must be between 1 and 100"
             );
         }
+    }
+
+    public JobApplicationResponse archiveApplication(Long id) {
+
+        User user = currentUserService.getCurrentUser();
+
+        JobApplication application = jobApplicationRepository.findByIdAndUser_Id(id, user.getId())
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        if (!application.isArchived()) {
+
+            application.setArchived(true);
+            application.setArchivedAt(LocalDateTime.now());
+        }
+
+        JobApplication archivedApplication = jobApplicationRepository.save(application);
+
+        return mapToResponse(archivedApplication);
+    }
+
+    public JobApplicationResponse restoreApplication(Long id) {
+
+        User user = currentUserService.getCurrentUser();
+
+        JobApplication application = jobApplicationRepository.findByIdAndUser_Id(id, user.getId())
+                        .orElseThrow(() ->
+                                new ApplicationNotFoundException(
+                                        "Job application not found"
+                                )
+                        );
+
+        if (application.isArchived()) {
+
+            application.setArchived(false);
+            application.setArchivedAt(null);
+        }
+
+        JobApplication restoredApplication = jobApplicationRepository.save(application);
+
+        return mapToResponse(restoredApplication);
     }
 }
