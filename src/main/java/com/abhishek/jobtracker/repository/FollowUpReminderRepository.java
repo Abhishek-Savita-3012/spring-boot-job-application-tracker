@@ -17,4 +17,9 @@ public interface FollowUpReminderRepository extends JpaRepository<FollowUpRemind
     List<FollowUpReminder> findAllByStatusAndRemindAtLessThanEqualAndNotifiedAtIsNullOrderByRemindAtAsc(ReminderStatus status, LocalDateTime currentTime);
 
     void deleteAllByJobApplication_Id(Long applicationId);
+
+    long countByJobApplication_User_IdAndJobApplication_ArchivedFalseAndStatus(
+            Long userId,
+            ReminderStatus status
+    );
 }
