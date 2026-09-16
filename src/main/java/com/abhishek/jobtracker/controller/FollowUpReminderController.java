@@ -1,5 +1,6 @@
 package com.abhishek.jobtracker.controller;
 
+import com.abhishek.jobtracker.dto.ApiResponse;
 import com.abhishek.jobtracker.dto.FollowUpReminderRequest;
 import com.abhishek.jobtracker.dto.FollowUpReminderResponse;
 import com.abhishek.jobtracker.service.FollowUpReminderService;
@@ -21,52 +22,82 @@ public class FollowUpReminderController {
     }
 
     @PostMapping
-    public ResponseEntity<FollowUpReminderResponse> createReminder(@PathVariable Long applicationId, @Valid @RequestBody FollowUpReminderRequest request) {
+    public ResponseEntity<ApiResponse<FollowUpReminderResponse>> createReminder(@PathVariable Long applicationId, @Valid @RequestBody FollowUpReminderRequest request) {
+
+        FollowUpReminderResponse response = reminderService.createReminder(applicationId, request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
-                        reminderService.createReminder(applicationId, request)
+                        ApiResponse.success(
+                                "A reminder created successfully",
+                                response
+                        )
                 );
     }
 
     @GetMapping
-    public ResponseEntity<List<FollowUpReminderResponse>> getAllReminders(@PathVariable Long applicationId) {
+    public ResponseEntity<ApiResponse<List<FollowUpReminderResponse>>> getAllReminders(@PathVariable Long applicationId) {
+
+        List<FollowUpReminderResponse> response = reminderService.getAllReminders(applicationId);
 
         return ResponseEntity.ok(
-                reminderService.getAllReminders(applicationId)
+                ApiResponse.success(
+                        "Reminders fetched successfully",
+                        response
+                )
         );
     }
 
     @GetMapping("/{reminderId}")
-    public ResponseEntity<FollowUpReminderResponse> getReminder(@PathVariable Long applicationId, @PathVariable Long reminderId) {
+    public ResponseEntity<ApiResponse<FollowUpReminderResponse>> getReminder(@PathVariable Long applicationId, @PathVariable Long reminderId) {
+
+        FollowUpReminderResponse response = reminderService.getReminder(applicationId, reminderId);
 
         return ResponseEntity.ok(
-                reminderService.getReminder(applicationId, reminderId)
+                ApiResponse.success(
+                        "Reminder fetched successfully",
+                        response
+                )
         );
     }
 
     @PutMapping("/{reminderId}")
-    public ResponseEntity<FollowUpReminderResponse> updateReminder(@PathVariable Long applicationId, @PathVariable Long reminderId, @Valid @RequestBody FollowUpReminderRequest request) {
+    public ResponseEntity<ApiResponse<FollowUpReminderResponse>> updateReminder(@PathVariable Long applicationId, @PathVariable Long reminderId, @Valid @RequestBody FollowUpReminderRequest request) {
+
+        FollowUpReminderResponse response = reminderService.updateReminder(applicationId, reminderId, request);
 
         return ResponseEntity.ok(
-                reminderService.updateReminder(applicationId, reminderId, request)
+                ApiResponse.success(
+                        "Reminder updated successfully",
+                        response
+                )
         );
     }
 
     @PatchMapping("/{reminderId}/complete")
-    public ResponseEntity<FollowUpReminderResponse> completeReminder(@PathVariable Long applicationId, @PathVariable Long reminderId) {
+    public ResponseEntity<ApiResponse<FollowUpReminderResponse>> completeReminder(@PathVariable Long applicationId, @PathVariable Long reminderId) {
+
+        FollowUpReminderResponse response = reminderService.completeReminder(applicationId, reminderId);
 
         return ResponseEntity.ok(
-                reminderService.completeReminder(applicationId, reminderId)
+                ApiResponse.success(
+                        "Reminder marked completed successfully",
+                        response
+                )
         );
     }
 
     @PatchMapping("/{reminderId}/cancel")
-    public ResponseEntity<FollowUpReminderResponse> cancelReminder(@PathVariable Long applicationId, @PathVariable Long reminderId) {
+    public ResponseEntity<ApiResponse<FollowUpReminderResponse>> cancelReminder(@PathVariable Long applicationId, @PathVariable Long reminderId) {
+
+        FollowUpReminderResponse response = reminderService.cancelReminder(applicationId, reminderId);
 
         return ResponseEntity.ok(
-                reminderService.cancelReminder(applicationId, reminderId)
+                ApiResponse.success(
+                        "Reminder marked cancelled successfully",
+                        response
+                )
         );
     }
 

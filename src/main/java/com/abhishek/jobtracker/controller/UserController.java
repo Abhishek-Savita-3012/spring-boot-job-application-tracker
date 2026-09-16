@@ -1,9 +1,6 @@
 package com.abhishek.jobtracker.controller;
 
-import com.abhishek.jobtracker.dto.LoginRequest;
-import com.abhishek.jobtracker.dto.LoginResponse;
-import com.abhishek.jobtracker.dto.RegisterRequest;
-import com.abhishek.jobtracker.dto.UserResponse;
+import com.abhishek.jobtracker.dto.*;
 import com.abhishek.jobtracker.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,29 +19,44 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> registerUser(@Valid @RequestBody RegisterRequest request) {
 
         UserResponse response = userService.registerUser(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(
+                        ApiResponse.success(
+                                "User registered successfully",
+                                response
+                        )
+                );
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> loginUser(@Valid @RequestBody LoginRequest request) {
 
         LoginResponse response = userService.loginUser(request);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "User logged-in successfully",
+                        response
+                )
+        );
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(Authentication authentication) {
 
         String email = authentication.getName();
         UserResponse response = userService.getUserByEmail(email);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "It's me",
+                        response
+                )
+        );
     }
 }

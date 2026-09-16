@@ -23,17 +23,22 @@ public class JobApplicationController {
     }
 
     @PostMapping
-    public ResponseEntity<JobApplicationResponse> createApplication(@Valid @RequestBody CreateJobApplicationRequest request) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> createApplication(@Valid @RequestBody CreateJobApplicationRequest request) {
 
         JobApplicationResponse response = jobApplicationService.createApplication(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(
+                        ApiResponse.success(
+                                "Job application created successfully",
+                                response
+                        )
+                );
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<JobApplicationResponse>> getApplications(
+    public ResponseEntity<ApiResponse<PageResponse<JobApplicationResponse>>> getApplications(
 
             @RequestParam(required = false)
             String keyword,
@@ -63,36 +68,47 @@ public class JobApplicationController {
             String direction
     ) {
 
+        PageResponse<JobApplicationResponse> response = jobApplicationService.getApplications(
+                keyword,
+                status,
+                workMode,
+                employmentType,
+                archived,
+                page,
+                size,
+                sortBy,
+                direction
+        );
+
         return ResponseEntity.ok(
-                jobApplicationService.getApplications(
-                        keyword,
-                        status,
-                        workMode,
-                        employmentType,
-                        archived,
-                        page,
-                        size,
-                        sortBy,
-                        direction
+                ApiResponse.success(
+                        "Applications fetched successfully",
+                        response
                 )
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<JobApplicationResponse> getApplicationById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> getApplicationById(@PathVariable Long id) {
 
+        JobApplicationResponse response = jobApplicationService.getApplicationById(id);
         return ResponseEntity.ok(
-                jobApplicationService.getApplicationById(id)
+                ApiResponse.success(
+                        "Job application fetched successfully",
+                        response
+                )
         );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<JobApplicationResponse> updateApplication(@PathVariable Long id, @Valid @RequestBody UpdateJobApplicationRequest request) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> updateApplication(@PathVariable Long id, @Valid @RequestBody UpdateJobApplicationRequest request) {
+
+        JobApplicationResponse response = jobApplicationService.updateApplication(id, request);
 
         return ResponseEntity.ok(
-                jobApplicationService.updateApplication(
-                        id,
-                        request
+                ApiResponse.success(
+                        "Job application updated successfully",
+                        response
                 )
         );
     }
@@ -106,50 +122,77 @@ public class JobApplicationController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<JobApplicationResponse> updateStatus(@PathVariable Long id, @Valid @RequestBody UpdateStatusRequest request) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> updateStatus(@PathVariable Long id, @Valid @RequestBody UpdateStatusRequest request) {
 
         JobApplicationResponse response = jobApplicationService.updateStatus(id, request.getStatus());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Application status updated successfully",
+                        response
+                )
+        );
     }
     @GetMapping("/{id}/status-history")
-    public ResponseEntity<List<StatusHistoryResponse>> getStatusHistory(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<List<StatusHistoryResponse>>> getStatusHistory(@PathVariable Long id) {
+
+        List<StatusHistoryResponse> history = jobApplicationService.getStatusHistory(id);
 
         return ResponseEntity.ok(
-                jobApplicationService
-                        .getStatusHistory(id)
+                ApiResponse.success(
+                        "Status history fetched successfully",
+                        history
+                )
         );
     }
 
     @PatchMapping("/{id}/resume/{resumeId}")
-    public ResponseEntity<JobApplicationResponse> attachResume(@PathVariable Long id, @PathVariable Long resumeId) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> attachResume(@PathVariable Long id, @PathVariable Long resumeId) {
+
+        JobApplicationResponse response = jobApplicationService.attachResume(id, resumeId);
 
         return ResponseEntity.ok(
-                jobApplicationService.attachResume(id, resumeId)
+                ApiResponse.success(
+                        "Resume attached successfully",
+                        response
+                )
         );
     }
 
     @DeleteMapping("/{id}/resume")
-    public ResponseEntity<JobApplicationResponse> detachResume(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> detachResume(@PathVariable Long id) {
+
+        JobApplicationResponse response = jobApplicationService.detachResume(id);
 
         return ResponseEntity.ok(
-                jobApplicationService.detachResume(id)
+                ApiResponse.success(
+                        "Resume detached successfully",
+                        response
+                )
         );
     }
 
     @PatchMapping("/{id}/archive")
-    public ResponseEntity<JobApplicationResponse> archiveApplication(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> archiveApplication(@PathVariable Long id) {
 
+        JobApplicationResponse response = jobApplicationService.archiveApplication(id);
         return ResponseEntity.ok(
-                jobApplicationService.archiveApplication(id)
+                ApiResponse.success(
+                        "Job application archived successfully",
+                        response
+                )
         );
     }
 
     @PatchMapping("/{id}/restore")
-    public ResponseEntity<JobApplicationResponse> restoreApplication(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<JobApplicationResponse>> restoreApplication(@PathVariable Long id) {
 
+        JobApplicationResponse response = jobApplicationService.restoreApplication(id);
         return ResponseEntity.ok(
-                jobApplicationService.restoreApplication(id)
+                ApiResponse.success(
+                        "Job application restored successfully",
+                        response
+                )
         );
     }
 }

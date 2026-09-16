@@ -1,5 +1,6 @@
 package com.abhishek.jobtracker.controller;
 
+import com.abhishek.jobtracker.dto.ApiResponse;
 import com.abhishek.jobtracker.dto.ResumeRequest;
 import com.abhishek.jobtracker.dto.ResumeResponse;
 import com.abhishek.jobtracker.service.ResumeService;
@@ -21,28 +22,43 @@ public class ResumeController {
     }
 
     @PostMapping
-    public ResponseEntity<ResumeResponse> createResume(@Valid @RequestBody ResumeRequest request) {
+    public ResponseEntity<ApiResponse<ResumeResponse>> createResume(@Valid @RequestBody ResumeRequest request) {
+
+        ResumeResponse response = resumeService.createResume(request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
-                        resumeService.createResume(request)
+                        ApiResponse.success(
+                                "Resume created successfully",
+                                response
+                        )
                 );
     }
 
     @GetMapping
-    public ResponseEntity<List<ResumeResponse>> getAllResumes() {
+    public ResponseEntity<ApiResponse<List<ResumeResponse>>> getAllResumes() {
+
+        List<ResumeResponse> response = resumeService.getAllResumes();
 
         return ResponseEntity.ok(
-                resumeService.getAllResumes()
+                ApiResponse.success(
+                        "Resumes fetched successfully",
+                        response
+                )
         );
     }
 
     @GetMapping("/{resumeId}")
-    public ResponseEntity<ResumeResponse> getResume(@PathVariable Long resumeId) {
+    public ResponseEntity<ApiResponse<ResumeResponse>> getResume(@PathVariable Long resumeId) {
+
+        ResumeResponse response = resumeService.getResume(resumeId);
 
         return ResponseEntity.ok(
-                resumeService.getResume(resumeId)
+                ApiResponse.success(
+                        "Resume fetched successfully",
+                        response
+                )
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.abhishek.jobtracker.controller;
 
+import com.abhishek.jobtracker.dto.ApiResponse;
 import com.abhishek.jobtracker.dto.DashboardResponse;
 import com.abhishek.jobtracker.service.DashboardService;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,15 @@ public class DashboardController {
     }
 
     @GetMapping
-    public ResponseEntity<DashboardResponse> getDashboard() {
+    public ResponseEntity<ApiResponse<DashboardResponse>> getDashboard() {
+
+        DashboardResponse dashboard = dashboardService.getDashboard();
+
         return ResponseEntity.ok(
-                dashboardService.getDashboard()
+                ApiResponse.success(
+                        "Dashboard analytics fetched successfully",
+                        dashboard
+                )
         );
     }
 }

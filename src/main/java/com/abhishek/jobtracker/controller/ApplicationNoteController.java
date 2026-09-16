@@ -1,5 +1,6 @@
 package com.abhishek.jobtracker.controller;
 
+import com.abhishek.jobtracker.dto.ApiResponse;
 import com.abhishek.jobtracker.dto.ApplicationNoteRequest;
 import com.abhishek.jobtracker.dto.ApplicationNoteResponse;
 import com.abhishek.jobtracker.service.ApplicationNoteService;
@@ -21,36 +22,56 @@ public class ApplicationNoteController {
     }
 
     @PostMapping
-    public ResponseEntity<ApplicationNoteResponse> createNote(@PathVariable Long applicationId, @Valid @RequestBody ApplicationNoteRequest request) {
+    public ResponseEntity<ApiResponse<ApplicationNoteResponse>> createNote(@PathVariable Long applicationId, @Valid @RequestBody ApplicationNoteRequest request) {
+
+        ApplicationNoteResponse response = applicationNoteService.createNote(applicationId, request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
-                        applicationNoteService.createNote(applicationId, request)
+                        ApiResponse.success(
+                                "Application Note created successfully",
+                                response
+                        )
                 );
     }
 
     @GetMapping
-    public ResponseEntity<List<ApplicationNoteResponse>> getAllNotes(@PathVariable Long applicationId) {
+    public ResponseEntity<ApiResponse<List<ApplicationNoteResponse>>> getAllNotes(@PathVariable Long applicationId) {
+
+        List<ApplicationNoteResponse> response = applicationNoteService.getAllNotes(applicationId);
 
         return ResponseEntity.ok(
-                applicationNoteService.getAllNotes(applicationId)
+                ApiResponse.success(
+                        "Notes fetched successfully",
+                        response
+                )
         );
     }
 
     @GetMapping("/{noteId}")
-    public ResponseEntity<ApplicationNoteResponse> getNote(@PathVariable Long applicationId, @PathVariable Long noteId) {
+    public ResponseEntity<ApiResponse<ApplicationNoteResponse>> getNote(@PathVariable Long applicationId, @PathVariable Long noteId) {
+
+        ApplicationNoteResponse response = applicationNoteService.getNote(applicationId, noteId);
 
         return ResponseEntity.ok(
-                applicationNoteService.getNote(applicationId, noteId)
+                ApiResponse.success(
+                        "Application Note fetched successfully",
+                        response
+                )
         );
     }
 
     @PutMapping("/{noteId}")
-    public ResponseEntity<ApplicationNoteResponse> updateNote(@PathVariable Long applicationId, @PathVariable Long noteId, @Valid @RequestBody ApplicationNoteRequest request) {
+    public ResponseEntity<ApiResponse<ApplicationNoteResponse>> updateNote(@PathVariable Long applicationId, @PathVariable Long noteId, @Valid @RequestBody ApplicationNoteRequest request) {
+
+        ApplicationNoteResponse response = applicationNoteService.updateNote(applicationId, noteId, request);
 
         return ResponseEntity.ok(
-                applicationNoteService.updateNote(applicationId, noteId, request)
+                ApiResponse.success(
+                        "Application Note updated successfully",
+                        response
+                )
         );
     }
 

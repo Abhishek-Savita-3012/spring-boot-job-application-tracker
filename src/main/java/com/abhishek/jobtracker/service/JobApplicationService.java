@@ -4,6 +4,7 @@ import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
 import com.abhishek.jobtracker.dto.JobApplicationResponse;
 import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
 import com.abhishek.jobtracker.entity.*;
+import com.abhishek.jobtracker.mapper.JobApplicationMapper;
 import com.abhishek.jobtracker.repository.*;
 import com.abhishek.jobtracker.security.CurrentUserService;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,6 @@ import com.abhishek.jobtracker.exception.InvalidPaginationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 @Service
 public class JobApplicationService {
@@ -35,8 +35,9 @@ public class JobApplicationService {
     private final ApplicationNoteRepository applicationNoteRepository;
     private final ResumeRepository resumeRepository;
     private final FollowUpReminderRepository followUpReminderRepository;
+    private final JobApplicationMapper jobApplicationMapper;
 
-    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository, ApplicationNoteRepository applicationNoteRepository, ResumeRepository resumeRepository, FollowUpReminderRepository followUpReminderRepository) {
+    public JobApplicationService(JobApplicationRepository jobApplicationRepository, CurrentUserService currentUserService, StatusHistoryRepository statusHistoryRepository, InterviewRoundRepository interviewRoundRepository, ApplicationNoteRepository applicationNoteRepository, ResumeRepository resumeRepository, FollowUpReminderRepository followUpReminderRepository, JobApplicationMapper jobApplicationMapper) {
         this.jobApplicationRepository = jobApplicationRepository;
         this.currentUserService = currentUserService;
         this.statusHistoryRepository = statusHistoryRepository;
@@ -44,6 +45,7 @@ public class JobApplicationService {
         this.applicationNoteRepository = applicationNoteRepository;
         this.resumeRepository = resumeRepository;
         this.followUpReminderRepository = followUpReminderRepository;
+        this.jobApplicationMapper = jobApplicationMapper;
     }
 
     @Transactional
@@ -79,7 +81,7 @@ public class JobApplicationService {
 
         statusHistoryRepository.save(initialHistory);
 
-        return mapToResponse(savedApplication);
+        return jobApplicationMapper.toResponse(savedApplication);
     }
 
     public JobApplicationResponse getApplicationById(Long id) {
@@ -94,7 +96,7 @@ public class JobApplicationService {
                                 )
                         );
 
-        return mapToResponse(application);
+        return jobApplicationMapper.toResponse(application);
     }
 
     public JobApplicationResponse updateApplication(Long id, UpdateJobApplicationRequest request) {
@@ -124,7 +126,7 @@ public class JobApplicationService {
 
         JobApplication updatedApplication = jobApplicationRepository.save(application);
 
-        return mapToResponse(updatedApplication);
+        return jobApplicationMapper.toResponse(updatedApplication);
     }
 
     @Transactional
@@ -161,7 +163,7 @@ public class JobApplicationService {
         ApplicationStatus oldStatus = application.getStatus();
 
         if (oldStatus == newStatus) {
-            return mapToResponse(application);
+            return jobApplicationMapper.toResponse(application);
         }
 
         application.setStatus(newStatus);
@@ -177,7 +179,7 @@ public class JobApplicationService {
 
         statusHistoryRepository.save(history);
 
-        return mapToResponse(updatedApplication);
+        return jobApplicationMapper.toResponse(updatedApplication);
     }
 
     public List<StatusHistoryResponse> getStatusHistory(Long applicationId) {
@@ -230,7 +232,7 @@ public class JobApplicationService {
 
         JobApplication updatedApplication = jobApplicationRepository.save(application);
 
-        return mapToResponse(updatedApplication);
+        return jobApplicationMapper.toResponse(updatedApplication);
     }
 
     public JobApplicationResponse detachResume(Long applicationId) {
@@ -248,37 +250,7 @@ public class JobApplicationService {
 
         JobApplication updatedApplication = jobApplicationRepository.save(application);
 
-        return mapToResponse(updatedApplication);
-    }
-
-    private JobApplicationResponse mapToResponse(JobApplication application) {
-
-        Resume resume = application.getResumeUsed();
-
-        return new JobApplicationResponse(
-                application.getId(),
-                application.getCompany(),
-                application.getRole(),
-                application.getLocation(),
-                application.getEmploymentType(),
-                application.getWorkMode(),
-                application.getSalary(),
-                application.getSalaryCurrency(),
-                application.getJobUrl(),
-                application.getSource(),
-                application.getStatus(),
-                application.getAppliedDate(),
-                application.getDeadline(),
-
-                resume != null ? resume.getId() : null,
-                resume != null ? resume.getLabel() : null,
-
-                application.getDescription(),
-                application.isArchived(),
-                application.getArchivedAt(),
-                application.getCreatedAt(),
-                application.getUpdatedAt()
-        );
+        return jobApplicationMapper.toResponse(updatedApplication);
     }
 
     private Sort buildSort(String sortBy, String direction) {
@@ -357,7 +329,7 @@ public class JobApplicationService {
                 applicationPage
                         .getContent()
                         .stream()
-                        .map(this::mapToResponse)
+                        .map(jobApplicationMapper::toResponse)
                         .toList();
 
         return new PageResponse<>(
@@ -405,7 +377,7 @@ public class JobApplicationService {
 
         JobApplication archivedApplication = jobApplicationRepository.save(application);
 
-        return mapToResponse(archivedApplication);
+        return jobApplicationMapper.toResponse(archivedApplication);
     }
 
     public JobApplicationResponse restoreApplication(Long id) {
@@ -427,6 +399,6 @@ public class JobApplicationService {
 
         JobApplication restoredApplication = jobApplicationRepository.save(application);
 
-        return mapToResponse(restoredApplication);
+        return jobApplicationMapper.toResponse(restoredApplication);
     }
 }

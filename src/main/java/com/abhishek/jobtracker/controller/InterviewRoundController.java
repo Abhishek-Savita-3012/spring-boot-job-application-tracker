@@ -1,5 +1,7 @@
 package com.abhishek.jobtracker.controller;
 
+import com.abhishek.jobtracker.dto.ApiResponse;
+import com.abhishek.jobtracker.dto.FollowUpReminderResponse;
 import com.abhishek.jobtracker.dto.InterviewRoundRequest;
 import com.abhishek.jobtracker.dto.InterviewRoundResponse;
 import com.abhishek.jobtracker.service.InterviewRoundService;
@@ -21,38 +23,58 @@ public class InterviewRoundController {
     }
 
     @PostMapping
-    public ResponseEntity<InterviewRoundResponse>
+    public ResponseEntity<ApiResponse<InterviewRoundResponse>>
     createInterviewRound(@PathVariable Long applicationId, @Valid @RequestBody InterviewRoundRequest request) {
+
+        InterviewRoundResponse response = interviewRoundService.createInterviewRound(applicationId, request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
-                        interviewRoundService.createInterviewRound(applicationId, request)
+                        ApiResponse.success(
+                                "Interview Round created successfully",
+                                response
+                        )
                 );
     }
 
     @GetMapping
-    public ResponseEntity<List<InterviewRoundResponse>>
+    public ResponseEntity<ApiResponse<List<InterviewRoundResponse>>>
     getAllInterviewRounds(@PathVariable Long applicationId) {
 
+        List<InterviewRoundResponse> response = interviewRoundService.getAllInterviewRounds(applicationId);
+
         return ResponseEntity.ok(
-                interviewRoundService.getAllInterviewRounds(applicationId)
+                ApiResponse.success(
+                        "Interview Rounds fetched successfully",
+                        response
+                )
         );
     }
 
     @GetMapping("/{roundId}")
-    public ResponseEntity<InterviewRoundResponse> getInterviewRound(@PathVariable Long applicationId, @PathVariable Long roundId) {
+    public ResponseEntity<ApiResponse<InterviewRoundResponse>> getInterviewRound(@PathVariable Long applicationId, @PathVariable Long roundId) {
+
+        InterviewRoundResponse response = interviewRoundService.getInterviewRound(applicationId, roundId);
 
         return ResponseEntity.ok(
-                interviewRoundService.getInterviewRound(applicationId, roundId)
+                ApiResponse.success(
+                        "Interview Round fetched successfully",
+                        response
+                )
         );
     }
 
     @PutMapping("/{roundId}")
-    public ResponseEntity<InterviewRoundResponse> updateInterviewRound(@PathVariable Long applicationId, @PathVariable Long roundId, @Valid @RequestBody InterviewRoundRequest request) {
+    public ResponseEntity<ApiResponse<InterviewRoundResponse>> updateInterviewRound(@PathVariable Long applicationId, @PathVariable Long roundId, @Valid @RequestBody InterviewRoundRequest request) {
+
+        InterviewRoundResponse response = interviewRoundService.updateInterviewRound(applicationId, roundId, request);
 
         return ResponseEntity.ok(
-                interviewRoundService.updateInterviewRound(applicationId, roundId, request)
+                ApiResponse.success(
+                        "Interview Round updated successfully",
+                        response
+                )
         );
     }
 
