@@ -124,6 +124,16 @@ public class JobApplicationService {
         application.setDeadline(request.getDeadline());
         application.setDescription(request.getDescription());
 
+        if (application.getAppliedDate() != null
+                && application.getDeadline() != null
+                && application.getDeadline()
+                .isBefore(application.getAppliedDate())) {
+
+            throw new IllegalArgumentException(
+                    "Deadline cannot be before the applied date"
+            );
+        }
+
         JobApplication updatedApplication = jobApplicationRepository.save(application);
 
         return jobApplicationMapper.toResponse(updatedApplication);

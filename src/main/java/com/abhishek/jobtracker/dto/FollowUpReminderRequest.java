@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @Setter
 public class FollowUpReminderRequest {
 
-    @NotNull(message = "Reminder date and time is required")
-    @Future(message = "Reminder must be scheduled in the future")
+    @NotNull(message = "Reminder time is required")
+    @Future(message = "Reminder time must be in the future")
     private LocalDateTime remindAt;
 
     @NotBlank(message = "Reminder message is required")
-    @Size(max = 1000, message = "Reminder message is too long")
+    @Size(max = 1000, message = "Reminder message cannot exceed 1000 characters")
     private String message;
 }

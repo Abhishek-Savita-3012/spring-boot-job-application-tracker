@@ -20,17 +20,19 @@ public class InterviewRoundRequest {
     private Integer roundNumber;
 
     @NotBlank(message = "Interview title is required")
+    @Size(max = 150, message = "Interview title cannot exceed 150 characters")
     private String title;
 
     @NotNull(message = "Interview round type is required")
     private InterviewRoundType roundType;
 
+    @NotNull(message = "Interview schedule is required")
     private LocalDateTime scheduledAt;
 
     private String interviewer;
 
     private InterviewOutcome outcome;
 
-    @Size(max = 5000, message = "Notes are too long")
+    @Size(max = 5000, message = "Interview notes cannot exceed 5000 characters")
     private String notes;
 }

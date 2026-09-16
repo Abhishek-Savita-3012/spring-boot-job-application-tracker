@@ -10,6 +10,6 @@ import lombok.Setter;
 public class ApplicationNoteRequest {
 
     @NotBlank(message = "Note content is required")
-    @Size(max = 5000, message = "Note is too long")
+    @Size(max = 5000, message = "Note cannot exceed 5000 characters")
     private String content;
 }

@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 public class UpdateStatusRequest {
 
-    @NotNull(message = "Status is required")
+    @NotNull(message = "Application status is required")
     private ApplicationStatus status;
 }
