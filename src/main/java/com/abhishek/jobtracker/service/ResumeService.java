@@ -4,6 +4,7 @@ import com.abhishek.jobtracker.dto.ResumeRequest;
 import com.abhishek.jobtracker.dto.ResumeResponse;
 import com.abhishek.jobtracker.entity.Resume;
 import com.abhishek.jobtracker.entity.User;
+import com.abhishek.jobtracker.exception.ResourceNotFoundException;
 import com.abhishek.jobtracker.repository.ResumeRepository;
 import com.abhishek.jobtracker.security.CurrentUserService;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class ResumeService {
 
         Resume resume = resumeRepository.findByIdAndUser_Id(resumeId, user.getId())
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Resume not found"
                         )
                 );

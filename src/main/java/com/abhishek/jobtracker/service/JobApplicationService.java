@@ -4,6 +4,7 @@ import com.abhishek.jobtracker.dto.CreateJobApplicationRequest;
 import com.abhishek.jobtracker.dto.JobApplicationResponse;
 import com.abhishek.jobtracker.dto.UpdateJobApplicationRequest;
 import com.abhishek.jobtracker.entity.*;
+import com.abhishek.jobtracker.exception.InvalidRequestException;
 import com.abhishek.jobtracker.mapper.JobApplicationMapper;
 import com.abhishek.jobtracker.repository.*;
 import com.abhishek.jobtracker.security.CurrentUserService;
@@ -129,7 +130,7 @@ public class JobApplicationService {
                 && application.getDeadline()
                 .isBefore(application.getAppliedDate())) {
 
-            throw new IllegalArgumentException(
+            throw new InvalidRequestException(
                     "Deadline cannot be before the applied date"
             );
         }

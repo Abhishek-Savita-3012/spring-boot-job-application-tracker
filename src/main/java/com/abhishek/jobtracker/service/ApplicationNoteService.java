@@ -6,6 +6,7 @@ import com.abhishek.jobtracker.entity.ApplicationNote;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
+import com.abhishek.jobtracker.exception.ResourceNotFoundException;
 import com.abhishek.jobtracker.repository.ApplicationNoteRepository;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
 import com.abhishek.jobtracker.security.CurrentUserService;
@@ -74,8 +75,8 @@ public class ApplicationNoteService {
 
         ApplicationNote note = applicationNoteRepository.findByIdAndJobApplication_Id(noteId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Note not found"
+                        new ResourceNotFoundException(
+                                "Application note not found"
                         )
                 );
 
@@ -88,8 +89,8 @@ public class ApplicationNoteService {
 
         ApplicationNote note = applicationNoteRepository.findByIdAndJobApplication_Id(noteId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Note not found"
+                        new ResourceNotFoundException(
+                                "Application note not found"
                         )
                 );
 
@@ -106,8 +107,8 @@ public class ApplicationNoteService {
 
         ApplicationNote note = applicationNoteRepository.findByIdAndJobApplication_Id(noteId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Note not found"
+                        new ResourceNotFoundException(
+                                "Application note not found"
                         )
                 );
 

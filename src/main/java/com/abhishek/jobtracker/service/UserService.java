@@ -5,7 +5,9 @@ import com.abhishek.jobtracker.dto.LoginResponse;
 import com.abhishek.jobtracker.dto.RegisterRequest;
 import com.abhishek.jobtracker.dto.UserResponse;
 import com.abhishek.jobtracker.entity.User;
+import com.abhishek.jobtracker.exception.DuplicateEmailException;
 import com.abhishek.jobtracker.exception.InvalidCredentialsException;
+import com.abhishek.jobtracker.exception.ResourceNotFoundException;
 import com.abhishek.jobtracker.repository.UserRepository;
 import com.abhishek.jobtracker.security.JwtService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,7 +29,9 @@ public class UserService {
     public UserResponse registerUser(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email is already registered");
+            throw new DuplicateEmailException(
+                    "An account with this email already exists"
+            );
         }
 
         User user = User.builder()
@@ -81,7 +85,7 @@ public class UserService {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found")
+                        new ResourceNotFoundException("User not found")
                 );
 
         return new UserResponse(

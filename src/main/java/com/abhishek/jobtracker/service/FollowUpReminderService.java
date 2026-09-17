@@ -7,6 +7,7 @@ import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.ReminderStatus;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
+import com.abhishek.jobtracker.exception.ResourceNotFoundException;
 import com.abhishek.jobtracker.repository.FollowUpReminderRepository;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
 import com.abhishek.jobtracker.security.CurrentUserService;
@@ -72,7 +73,7 @@ public class FollowUpReminderService {
 
         FollowUpReminder reminder = reminderRepository.findByIdAndJobApplication_Id(reminderId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Reminder not found"
                         )
                 );
@@ -85,11 +86,11 @@ public class FollowUpReminderService {
         getOwnedApplication(applicationId);
 
         FollowUpReminder reminder = reminderRepository.findByIdAndJobApplication_Id(reminderId, applicationId)
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Reminder not found"
-                                )
-                        );
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Reminder not found"
+                        )
+                );
 
         reminder.setRemindAt(request.getRemindAt());
         reminder.setMessage(request.getMessage());
@@ -107,7 +108,7 @@ public class FollowUpReminderService {
 
         FollowUpReminder reminder = reminderRepository.findByIdAndJobApplication_Id(reminderId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Reminder not found"
                         )
                 );
@@ -125,7 +126,7 @@ public class FollowUpReminderService {
 
         FollowUpReminder reminder = reminderRepository.findByIdAndJobApplication_Id(reminderId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Reminder not found"
                         )
                 );
@@ -143,7 +144,7 @@ public class FollowUpReminderService {
 
         FollowUpReminder reminder = reminderRepository.findByIdAndJobApplication_Id(reminderId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Reminder not found"
                         )
                 );

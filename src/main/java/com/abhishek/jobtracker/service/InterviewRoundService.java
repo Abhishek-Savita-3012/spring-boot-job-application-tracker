@@ -6,6 +6,7 @@ import com.abhishek.jobtracker.entity.InterviewRound;
 import com.abhishek.jobtracker.entity.JobApplication;
 import com.abhishek.jobtracker.entity.User;
 import com.abhishek.jobtracker.exception.ApplicationNotFoundException;
+import com.abhishek.jobtracker.exception.ResourceNotFoundException;
 import com.abhishek.jobtracker.repository.InterviewRoundRepository;
 import com.abhishek.jobtracker.repository.JobApplicationRepository;
 import com.abhishek.jobtracker.security.CurrentUserService;
@@ -82,7 +83,7 @@ public class InterviewRoundService {
         InterviewRound round =
                 interviewRoundRepository.findByIdAndJobApplication_Id(roundId, applicationId)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new ResourceNotFoundException(
                                         "Interview round not found"
                                 )
                         );
@@ -96,7 +97,7 @@ public class InterviewRoundService {
 
         InterviewRound round = interviewRoundRepository.findByIdAndJobApplication_Id(roundId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Interview round not found"
                         )
                 );
@@ -124,7 +125,7 @@ public class InterviewRoundService {
 
         InterviewRound round = interviewRoundRepository.findByIdAndJobApplication_Id(roundId, applicationId)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Interview round not found"
                         )
                 );
