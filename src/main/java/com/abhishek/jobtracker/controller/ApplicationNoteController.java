@@ -4,6 +4,7 @@ import com.abhishek.jobtracker.dto.ApiResponse;
 import com.abhishek.jobtracker.dto.ApplicationNoteRequest;
 import com.abhishek.jobtracker.dto.ApplicationNoteResponse;
 import com.abhishek.jobtracker.service.ApplicationNoteService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(
+        name = "Application Notes",
+        description = "Manage notes belonging to job applications"
+)
 @RestController
 @RequestMapping("/api/applications/{applicationId}/notes")
 public class ApplicationNoteController {

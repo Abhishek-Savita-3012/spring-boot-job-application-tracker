@@ -5,6 +5,7 @@ import com.abhishek.jobtracker.dto.FollowUpReminderResponse;
 import com.abhishek.jobtracker.dto.InterviewRoundRequest;
 import com.abhishek.jobtracker.dto.InterviewRoundResponse;
 import com.abhishek.jobtracker.service.InterviewRoundService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(
+        name = "Interview Rounds",
+        description = "Manage interview rounds for job applications"
+)
 @RestController
 @RequestMapping("/api/applications/{applicationId}/interviews")
 public class InterviewRoundController {

@@ -7,7 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(
+        name = "Users",
+        description = "User registration, authentication and profile APIs"
+)
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -18,6 +24,28 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates a new user account using name, email and password.",
+            security = {}
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description = "User registered successfully"
+            ),
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Validation failed"
+            ),
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "409",
+                    description = "Email already exists"
+            )
+    })
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> registerUser(@Valid @RequestBody RegisterRequest request) {
 
@@ -33,6 +61,28 @@ public class UserController {
                 );
     }
 
+    @Operation(
+            summary = "Login user",
+            description = "Authenticates a user and returns a JWT access token.",
+            security = {}
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Login successful"
+            ),
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request"
+            ),
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "Invalid email or password"
+            )
+    })
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> loginUser(@Valid @RequestBody LoginRequest request) {
 
@@ -46,6 +96,10 @@ public class UserController {
         );
     }
 
+    @Operation(
+            summary = "Get current user",
+            description = "Returns the profile of the currently authenticated user."
+    )
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(Authentication authentication) {
 

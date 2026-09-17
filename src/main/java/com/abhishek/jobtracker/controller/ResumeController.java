@@ -4,6 +4,7 @@ import com.abhishek.jobtracker.dto.ApiResponse;
 import com.abhishek.jobtracker.dto.ResumeRequest;
 import com.abhishek.jobtracker.dto.ResumeResponse;
 import com.abhishek.jobtracker.service.ResumeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(
+        name = "Resumes",
+        description = "Manage resume references"
+)
 @RestController
 @RequestMapping("/api/resumes")
 public class ResumeController {
