@@ -26,6 +26,18 @@ public class ApplicationNoteController {
         this.applicationNoteService = applicationNoteService;
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description = "Application Note created successfully"
+            ),
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "Authentication required"
+            ),
+    })
     @PostMapping
     public ResponseEntity<ApiResponse<ApplicationNoteResponse>> createNote(@PathVariable Long applicationId, @Valid @RequestBody ApplicationNoteRequest request) {
 
