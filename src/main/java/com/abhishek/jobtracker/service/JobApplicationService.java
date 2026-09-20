@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @Service
+@Transactional(readOnly = true)
 public class JobApplicationService {
 
     private final JobApplicationRepository jobApplicationRepository;
@@ -100,6 +101,7 @@ public class JobApplicationService {
         return jobApplicationMapper.toResponse(application);
     }
 
+    @Transactional
     public JobApplicationResponse updateApplication(Long id, UpdateJobApplicationRequest request) {
 
         User user = currentUserService.getCurrentUser();
