@@ -222,6 +222,13 @@ public class JobApplicationController {
         );
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204",
+                    description = "Job Application Deleted Successfully"
+            )
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteApplication(@PathVariable Long id) {
 

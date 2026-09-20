@@ -113,6 +113,13 @@ public class FollowUpReminderController {
         );
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204",
+                    description = "Reminder Deleted Successfully"
+            )
+    })
     @DeleteMapping("/{reminderId}")
     public ResponseEntity<Void> deleteReminder(@PathVariable Long applicationId, @PathVariable Long reminderId) {
 

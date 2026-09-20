@@ -92,6 +92,13 @@ public class ApplicationNoteController {
         );
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204",
+                    description = "Job Application Note Deleted Successfully"
+            )
+    })
     @DeleteMapping("/{noteId}")
     public ResponseEntity<Void> deleteNote(@PathVariable Long applicationId, @PathVariable Long noteId) {
 

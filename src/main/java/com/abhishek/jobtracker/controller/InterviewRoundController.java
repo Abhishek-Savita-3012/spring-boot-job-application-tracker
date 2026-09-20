@@ -90,6 +90,13 @@ public class InterviewRoundController {
         );
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204",
+                    description = "Interview Round Deleted Successfully"
+            )
+    })
     @DeleteMapping("/{roundId}")
     public ResponseEntity<Void> deleteInterviewRound(@PathVariable Long applicationId, @PathVariable Long roundId) {
 
