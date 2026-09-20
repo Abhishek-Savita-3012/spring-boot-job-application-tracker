@@ -26,6 +26,13 @@ public class FollowUpReminderController {
         this.reminderService = reminderService;
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description = "Reminder created successfully"
+            )
+    })
     @PostMapping
     public ResponseEntity<ApiResponse<FollowUpReminderResponse>> createReminder(@PathVariable Long applicationId, @Valid @RequestBody FollowUpReminderRequest request) {
 

@@ -27,6 +27,13 @@ public class InterviewRoundController {
         this.interviewRoundService = interviewRoundService;
     }
 
+    @io.swagger.v3.oas.annotations.responses.ApiResponses({
+
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description = "Interview Round created successfully"
+            )
+    })
     @PostMapping
     public ResponseEntity<ApiResponse<InterviewRoundResponse>>
     createInterviewRound(@PathVariable Long applicationId, @Valid @RequestBody InterviewRoundRequest request) {

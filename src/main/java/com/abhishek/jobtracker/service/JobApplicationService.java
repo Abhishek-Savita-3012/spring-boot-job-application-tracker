@@ -221,6 +221,7 @@ public class JobApplicationService {
         );
     }
 
+    @Transactional
     public JobApplicationResponse attachResume(Long applicationId, Long resumeId) {
 
         User user = currentUserService.getCurrentUser();
@@ -246,6 +247,7 @@ public class JobApplicationService {
         return jobApplicationMapper.toResponse(updatedApplication);
     }
 
+    @Transactional
     public JobApplicationResponse detachResume(Long applicationId) {
 
         User user = currentUserService.getCurrentUser();
@@ -369,6 +371,7 @@ public class JobApplicationService {
         }
     }
 
+    @Transactional
     public JobApplicationResponse archiveApplication(Long id) {
 
         User user = currentUserService.getCurrentUser();
@@ -391,6 +394,7 @@ public class JobApplicationService {
         return jobApplicationMapper.toResponse(archivedApplication);
     }
 
+    @Transactional
     public JobApplicationResponse restoreApplication(Long id) {
 
         User user = currentUserService.getCurrentUser();
